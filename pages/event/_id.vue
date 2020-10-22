@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Individual Event: {{ $route.params.id }}</h1>
+        <h1>{{ event.title }}</h1>
     </div>
 </template>
 
@@ -8,21 +8,32 @@
 export default {
     head() {
         return {
-            title: `Event #${this.id}`,
+            title: `Event #${this.event.title}`,
             meta: [
                 {
                     hid: 'description',
                     name: 'description',
-                    content: `What you need to know about Event #${this.id}`,
+                    content: `What you need to know about ${this.event.title}`,
                 },
             ],
         }
     },
 
-    computed: {
-        id() {
-            return this.$route.params.id
-        },
+    async asyncData({ $axios, error, params: { id } }) {
+        try {
+            const response = await $axios.get(
+                `http://localhost:3334/events/${id}`
+            )
+
+            return {
+                event: response.data,
+            }
+        } catch {
+            error({
+                statusCode: 503,
+                message: `Unable to fetch event #${id}.`,
+            })
+        }
     },
 }
 </script>

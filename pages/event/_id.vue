@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
     head() {
         return {
@@ -19,15 +21,9 @@ export default {
         }
     },
 
-    async asyncData({ $axios, error, params: { id } }) {
+    async fetch({ store, error, params: { id } }) {
         try {
-            const response = await $axios.get(
-                `http://localhost:3334/events/${id}`
-            )
-
-            return {
-                event: response.data,
-            }
+            await store.dispatch('events/fetchEvent', id)
         } catch {
             error({
                 statusCode: 503,
@@ -35,5 +31,9 @@ export default {
             })
         }
     },
+
+    computed: mapState({
+        event: (state) => state.events.event,
+    }),
 }
 </script>
